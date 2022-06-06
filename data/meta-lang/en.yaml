@@ -1,0 +1,9 @@
+en:
+    annotation: [annotation, Annotation, ANNOTATION]
+    author: [author, Author, AUTHOR]
+    cover: [cover, Cover, COVER]
+    date: [date, Date, DATE, year, Year, YEAR]
+    genre: [genre, Genre, GENRE]
+    lang: [lang, Lang, LANG, language, Language, LANGUAGE]
+    title: [title, Title, TITLE]
+    series: [series, Series, SERIES]

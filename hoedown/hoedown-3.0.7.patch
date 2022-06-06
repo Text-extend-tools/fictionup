@@ -1,0 +1,341 @@
+diff -ur hoedown-3.0.7/src/autolink.c hoedown/src/autolink.c
+--- hoedown-3.0.7/src/autolink.c	2015-12-03 21:14:30.000000000 +0300
++++ hoedown/src/autolink.c	2017-11-28 17:27:08.000000000 +0300
+@@ -39,6 +39,9 @@
+ 	uint8_t cclose, copen = 0;
+ 	size_t i;
+ 
++        (void)max_rewind; /* Unused */
++        (void)size; /* Unused */
++
+ 	for (i = 0; i < link_end; ++i)
+ 		if (data[i] == '<') {
+ 			link_end = i;
+@@ -154,6 +157,8 @@
+ {
+ 	size_t link_end;
+ 
++        (void)flags; /* Unused */
++
+ 	if (max_rewind > 0 && !ispunct(data[-1]) && !isspace(data[-1]))
+ 		return 0;
+ 
+@@ -191,6 +196,8 @@
+ 	size_t link_end, rewind;
+ 	int nb = 0, np = 0;
+ 
++        (void)flags; /* Unused */
++
+ 	for (rewind = 0; rewind < max_rewind; ++rewind) {
+ 		uint8_t c = data[-1 - rewind];
+ 
+diff -ur hoedown-3.0.7/src/buffer.c hoedown/src/buffer.c
+--- hoedown-3.0.7/src/buffer.c	2015-12-03 21:14:30.000000000 +0300
++++ hoedown/src/buffer.c	2016-05-11 20:33:00.000000000 +0300
+@@ -203,7 +203,7 @@
+ 			return buf->data[i] - prefix[i];
+ 	}
+ 
+-	return 0;
++	return 0 - prefix[i];
+ }
+ 
+ void
+diff -ur hoedown-3.0.7/src/document.c hoedown/src/document.c
+--- hoedown-3.0.7/src/document.c	2015-12-03 21:14:30.000000000 +0300
++++ hoedown/src/document.c	2019-05-03 16:26:53.079379700 +0300
+@@ -126,6 +126,8 @@
+ 	hoedown_extensions ext_flags;
+ 	size_t max_nesting;
+ 	int in_link_body;
++        int list_nesting;
++        int quote_nesting;
+ };
+ 
+ /***************************
+@@ -245,6 +247,8 @@
+ {
+ 	struct footnote_ref *ref = hoedown_calloc(1, sizeof(struct footnote_ref));
+ 
++        (void)list; /* Unused */
++
+ 	ref->id = hash_link_ref(name, name_size);
+ 
+ 	return ref;
+@@ -813,6 +817,8 @@
+ static size_t
+ char_linebreak(hoedown_buffer *ob, hoedown_document *doc, uint8_t *data, size_t offset, size_t size)
+ {
++        (void)size; /* Unused */
++
+ 	if (offset < 2 || data[-1] != ' ' || data[-2] != ' ')
+ 		return 0;
+ 
+@@ -831,6 +837,8 @@
+ 	hoedown_buffer work = { NULL, 0, 0, 0, NULL, NULL, NULL };
+ 	size_t end, nb = 0, i, f_begin, f_end;
+ 
++        (void)offset; /* Unused */
++
+ 	/* counting the number of backticks in the delimiter */
+ 	while (nb < size && data[nb] == '`')
+ 		nb++;
+@@ -875,6 +883,8 @@
+ {
+ 	size_t end, nq = 0, i, f_begin, f_end;
+ 
++        (void)offset; /* Unused */
++
+ 	/* counting the number of quotes in the delimiter */
+ 	while (nq < size && data[nq] == '"')
+ 		nq++;
+@@ -956,6 +966,8 @@
+ 	size_t end = 1;
+ 	hoedown_buffer work = { 0, 0, 0, 0, NULL, NULL, NULL };
+ 
++        (void)offset; /* Unused */
++
+ 	if (end < size && data[end] == '#')
+ 		end++;
+ 
+@@ -986,6 +998,8 @@
+ 	size_t end = tag_length(data, size, &altype);
+ 	int ret = 0;
+ 
++        (void)offset; /* Unused */
++
+ 	work.data = data;
+ 	work.size = end;
+ 
+@@ -1172,7 +1186,7 @@
+ 			}
+ 			else if (data[i] == ')') {
+ 				if (nb_p == 0) break;
+-				else nb_p--; i++;
++				nb_p--; i++;
+ 			} else if (i >= 1 && _isspace(data[i-1]) && (data[i] == '\'' || data[i] == '"')) break;
+ 			else i++;
+ 		}
+@@ -1322,6 +1336,8 @@
+ 	size_t sup_start, sup_len;
+ 	hoedown_buffer *sup;
+ 
++        (void)offset; /* Unused */
++
+ 	if (!doc->md.superscript)
+ 		return 0;
+ 
+@@ -1648,9 +1664,13 @@
+ 		beg = end;
+ 	}
+ 
++        ++doc->quote_nesting;
+ 	parse_block(out, doc, work_data, work_size);
++        --doc->quote_nesting;
++
+ 	if (doc->md.blockquote)
+-		doc->md.blockquote(ob, out, &doc->data);
++		doc->md.blockquote(ob, out, doc->quote_nesting, &doc->data);
++
+ 	popbuf(doc, BUFFER_BLOCK);
+ 	return end;
+ }
+@@ -1892,9 +1912,6 @@
+ 
+ 		/* checking for a new item */
+ 		if ((has_next_uli && !is_hrule(data + beg + i, end - beg - i)) || has_next_oli) {
+-			if (in_empty)
+-				has_inside_empty = 1;
+-
+ 			/* the following item must have the same (or less) indentation */
+ 			if (pre <= orgpre) {
+ 				/* if the following item has different list type, we end this list */
+@@ -1906,6 +1923,9 @@
+ 				break;
+ 			}
+ 
++			if (in_empty)
++				has_inside_empty = 1;
++
+ 			if (!sublist)
+ 				sublist = work->size;
+ 		}
+@@ -1932,6 +1952,8 @@
+ 	if (has_inside_empty)
+ 		*flags |= HOEDOWN_LI_BLOCK;
+ 
++        ++doc->list_nesting;
++
+ 	if (*flags & HOEDOWN_LI_BLOCK) {
+ 		/* intermediate render of block li */
+ 		if (sublist && sublist < work->size) {
+@@ -1950,9 +1972,11 @@
+ 			parse_inline(inter, doc, work->data, work->size);
+ 	}
+ 
++        --doc->list_nesting;
++
+ 	/* render of li itself */
+ 	if (doc->md.listitem)
+-		doc->md.listitem(ob, inter, *flags, &doc->data);
++		doc->md.listitem(ob, inter, *flags, doc->list_nesting, &doc->data);
+ 
+ 	popbuf(doc, BUFFER_SPAN);
+ 	popbuf(doc, BUFFER_SPAN);
+@@ -1978,7 +2002,7 @@
+ 	}
+ 
+ 	if (doc->md.list)
+-		doc->md.list(ob, work, flags, &doc->data);
++		doc->md.list(ob, work, flags, doc->list_nesting, &doc->data);
+ 	popbuf(doc, BUFFER_BLOCK);
+ 	return i;
+ }
+@@ -2070,6 +2094,8 @@
+ {
+ 	size_t i = tag_len + 3, w;
+ 
++        (void)doc; /* Unused */
++
+ 	/* try to match the end tag */
+ 	/* note: we're not considering tags like "</tag >" which are still valid */
+ 	if (i > size ||
+@@ -2444,6 +2470,57 @@
+ 	return i;
+ }
+ 
++/* parse_yaml_meta • handles parsing of YAML metadata block */
++static size_t
++parse_yaml_meta(hoedown_buffer *ob, hoedown_document *doc, uint8_t *data, size_t size)
++{
++	size_t i;
++	size_t n_empty;
++	size_t yaml_start, yaml_end;
++	uint8_t *eol;
++
++	/* check for "---" at line start */
++	if (size < 4 || memcmp(data, "---", 3) != 0) return 0;
++	i = 3;
++
++	/* skip spaces */
++	if ((n_empty = is_empty(data + i, size - i)) == 0) return 0;
++	i += n_empty;
++
++	yaml_start = i;
++	yaml_end = i;
++
++	/* search for the end of block */
++	while (size - i >= 4) {
++		/* check for marker */
++		if (memcmp(data + i, "---", 3) == 0 || memcmp(data + i, "...", 3) == 0) {
++			i += 3;
++
++			if((n_empty = is_empty(data + i, size - i)) != 0) {
++				yaml_end = i - 3;
++				i += n_empty;
++				break;
++			}
++		}
++
++		/* to next line */
++		if ((eol = memchr(data + i, '\n', size - i)) == NULL) return 0;
++		i = eol - data + 1;
++	}
++
++	if (yaml_end <= yaml_start) return 0;
++
++	if (doc->md.yaml_meta) {
++		hoedown_buffer *work = newbuf(doc, BUFFER_BLOCK);
++
++		hoedown_buffer_put(work, data + yaml_start, yaml_end - yaml_start);
++		doc->md.yaml_meta(ob, work, &doc->data);
++		popbuf(doc, BUFFER_BLOCK);
++	}
++
++	return i;
++}
++
+ /* parse_block • parsing of one block, returning next uint8_t to parse */
+ static void
+ parse_block(hoedown_buffer *ob, hoedown_document *doc, uint8_t *data, size_t size)
+@@ -2470,6 +2547,10 @@
+ 		else if ((i = is_empty(txt_data, end)) != 0)
+ 			beg += i;
+ 
++		else if ((doc->ext_flags & HOEDOWN_EXT_YAML_META) != 0 &&
++				(i = parse_yaml_meta(ob, doc, txt_data, end)) != 0)
++			beg += i;
++
+ 		else if (is_hrule(txt_data, end)) {
+ 			if (doc->md.hrule)
+ 				doc->md.hrule(ob, &doc->data);
+@@ -2834,6 +2915,9 @@
+ 	doc->max_nesting = max_nesting;
+ 	doc->in_link_body = 0;
+ 
++        doc->list_nesting = 1;
++        doc->quote_nesting = 1;
++
+ 	return doc;
+ }
+ 
+diff -ur hoedown-3.0.7/src/document.h hoedown/src/document.h
+--- hoedown-3.0.7/src/document.h	2015-12-03 21:14:30.000000000 +0300
++++ hoedown/src/document.h	2017-12-14 17:26:16.000000000 +0300
+@@ -20,15 +20,16 @@
+ 	HOEDOWN_EXT_TABLES = (1 << 0),
+ 	HOEDOWN_EXT_FENCED_CODE = (1 << 1),
+ 	HOEDOWN_EXT_FOOTNOTES = (1 << 2),
++	HOEDOWN_EXT_YAML_META = (1 << 3),
+ 
+ 	/* span-level extensions */
+-	HOEDOWN_EXT_AUTOLINK = (1 << 3),
+-	HOEDOWN_EXT_STRIKETHROUGH = (1 << 4),
+-	HOEDOWN_EXT_UNDERLINE = (1 << 5),
+-	HOEDOWN_EXT_HIGHLIGHT = (1 << 6),
+-	HOEDOWN_EXT_QUOTE = (1 << 7),
+-	HOEDOWN_EXT_SUPERSCRIPT = (1 << 8),
+-	HOEDOWN_EXT_MATH = (1 << 9),
++	HOEDOWN_EXT_AUTOLINK = (1 << 4),
++	HOEDOWN_EXT_STRIKETHROUGH = (1 << 5),
++	HOEDOWN_EXT_UNDERLINE = (1 << 6),
++	HOEDOWN_EXT_HIGHLIGHT = (1 << 7),
++	HOEDOWN_EXT_QUOTE = (1 << 8),
++	HOEDOWN_EXT_SUPERSCRIPT = (1 << 9),
++	HOEDOWN_EXT_MATH = (1 << 10),
+ 
+ 	/* other flags */
+ 	HOEDOWN_EXT_NO_INTRA_EMPHASIS = (1 << 11),
+@@ -42,7 +43,8 @@
+ #define HOEDOWN_EXT_BLOCK (\
+ 	HOEDOWN_EXT_TABLES |\
+ 	HOEDOWN_EXT_FENCED_CODE |\
+-	HOEDOWN_EXT_FOOTNOTES )
++	HOEDOWN_EXT_FOOTNOTES |\
++	HOEDOWN_EXT_YAML_META )
+ 
+ #define HOEDOWN_EXT_SPAN (\
+ 	HOEDOWN_EXT_AUTOLINK |\
+@@ -100,11 +102,11 @@
+ 
+ 	/* block level callbacks - NULL skips the block */
+ 	void (*blockcode)(hoedown_buffer *ob, const hoedown_buffer *text, const hoedown_buffer *lang, const hoedown_renderer_data *data);
+-	void (*blockquote)(hoedown_buffer *ob, const hoedown_buffer *content, const hoedown_renderer_data *data);
++	void (*blockquote)(hoedown_buffer *ob, const hoedown_buffer *content, int level, const hoedown_renderer_data *data);
+ 	void (*header)(hoedown_buffer *ob, const hoedown_buffer *content, int level, const hoedown_renderer_data *data);
+ 	void (*hrule)(hoedown_buffer *ob, const hoedown_renderer_data *data);
+-	void (*list)(hoedown_buffer *ob, const hoedown_buffer *content, hoedown_list_flags flags, const hoedown_renderer_data *data);
+-	void (*listitem)(hoedown_buffer *ob, const hoedown_buffer *content, hoedown_list_flags flags, const hoedown_renderer_data *data);
++	void (*list)(hoedown_buffer *ob, const hoedown_buffer *content, hoedown_list_flags flags, int level, const hoedown_renderer_data *data);
++	void (*listitem)(hoedown_buffer *ob, const hoedown_buffer *content, hoedown_list_flags flags, int level, const hoedown_renderer_data *data);
+ 	void (*paragraph)(hoedown_buffer *ob, const hoedown_buffer *content, const hoedown_renderer_data *data);
+ 	void (*table)(hoedown_buffer *ob, const hoedown_buffer *content, const hoedown_renderer_data *data);
+ 	void (*table_header)(hoedown_buffer *ob, const hoedown_buffer *content, const hoedown_renderer_data *data);
+@@ -114,6 +116,7 @@
+ 	void (*footnotes)(hoedown_buffer *ob, const hoedown_buffer *content, const hoedown_renderer_data *data);
+ 	void (*footnote_def)(hoedown_buffer *ob, const hoedown_buffer *content, unsigned int num, const hoedown_renderer_data *data);
+ 	void (*blockhtml)(hoedown_buffer *ob, const hoedown_buffer *text, const hoedown_renderer_data *data);
++	void (*yaml_meta)(hoedown_buffer *ob, const hoedown_buffer *content, const hoedown_renderer_data *data);
+ 
+ 	/* span level callbacks - NULL or return 0 prints the span verbatim */
+ 	int (*autolink)(hoedown_buffer *ob, const hoedown_buffer *link, hoedown_autolink_type type, const hoedown_renderer_data *data);

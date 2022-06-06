@@ -1,0 +1,91 @@
+.TH FICTIONUP 1
+
+.SH NAME
+fictionup \- markdown to FB2 converter.
+
+.SH SYNOPSIS
+.SY fictionup
+.OP \-\-version
+.OP \-h|\-\-help
+.OP \-m meta_tag:meta_value
+.OP \-z
+.OP \-o output_file.fb2|output_dir
+.RI [ input_file.md ]
+.YS
+
+.SH DESCRIPTION
+fictionup converts markdown formatted document to FB2 XML file.
+
+If no input file name was provided or input file name is '\-', standard input stream will be used for input.
+If no output file name was provided and standart input stream is used for input,
+or output file name is '\-', standart output stream will be used for output.
+If only the input file name was provided, output file name will be constructed from input
+by replacing '.md' or '.markdown' extension by '.fb2'.
+If output file name is empty string ('' or ""), the output file will be placed in the same directory
+where the input file resides, instead of current working directory.
+
+fictionup supports a limited set of FB2 meta information tags, which are required to produce valid documents.
+
+FB2 meta information must be provided using YAML data blocks in a markdown document
+or by '-m' command line switch. YAML data block starts with the line containing '\-\-\-'
+(exactly 3 minus signs) and ends with the similarly formatted line or with '...'
+(exactly 3 dots).
+
+.SH META INFORMATION EXAMPLE
+.EX
+\-\-\-
+Title: The Book
+Author: A. Writer
+Year: 2019
+Annotation: This book is awesome!
+Cover: cover.jpg
+fb2\-author: B. Converter
+fb2\-id: doc\-001
+fb2\-version: 1.0
+fb2\-date: 2019
+\-\-\-
+.EE
+
+.SH OPTIONS
+.TP
+.BI \-\-version
+\-\ print a version information;
+.TP
+.BI \-h|\-\-help
+\-\ print a short help;
+.TP
+.BI \-m \ meta_tag:meta_value
+\-\ add a meta information to the document;
+.TP
+.BI \-z
+\-\ compress the output file using ZIP format (produce .fb2.zip);
+.TP
+.BI \-o
+\-\ specify the output file name or directory.
+
+.SH FILES
+Default meta information values may be specified in configuration file 'default.yaml'.
+Possible locations for this file are:
+.IP *
+.I $XDG_CONFIG_HOME/fictionup/default.yaml
+.IP *
+.I $HOME/.config/fictionup/default.yaml
+
+.SH COPYRIGHT
+Copyright (C) 2017-2019 Vadim Druzhin <cdslow@mail.ru>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+.SH AUTHOR
+Vadim Druzhin <cdslow@mail.ru>

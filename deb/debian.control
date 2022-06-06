@@ -1,0 +1,12 @@
+Source: fictionup
+Section: text
+Priority: optional
+Maintainer: Vadim Druzhin <cdslow@mail.ru>
+Build-Depends: debhelper (>=7.0.50~), libyaml-dev, zlib1g-dev, cmake
+
+Package: fictionup
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, 
+Description: markdown to FB2 converter
+ fictionup is a command line tool for converting markdown formatted document to FB2 XML file.
+

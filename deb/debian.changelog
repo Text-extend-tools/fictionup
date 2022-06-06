@@ -1,0 +1,19 @@
+fictionup (0.2.1-1) stable; urgency=low
+
+  * Add workaround for Gentoo patched zlib.
+
+ -- Vadim Druzhin <cdslow@mail.ru>  Wed, 11 Sep 2019 20:54:31 +0300
+
+fictionup (0.2-1) stable; urgency=low
+
+  * Add 'Series:' meta-information tag;
+  * Support markdown formatting in the annotation;
+  * Add ZIP output.
+
+ -- Vadim Druzhin <cdslow@mail.ru>  Sun, 05 May 2019 17:20:09 +0300
+
+fictionup (0.1-1) stable; urgency=low
+
+  * Initial Release
+
+ -- Vadim Druzhin <cdslow@mail.ru>  Fri, 15 Dec 2017 10:26:34 +0300

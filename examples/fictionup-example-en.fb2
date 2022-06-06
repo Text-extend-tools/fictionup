@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FictionBook xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.gribuser.ru/xml/fictionbook/2.0">
+<description><title-info>
+<genre>computers</genre>
+<author><first-name>Vadim</first-name><last-name>Druzhin</last-name></author>
+<book-title>FICTIONUP MARKDOWN EXAMPLE</book-title>
+<annotation><p>The example of prepared for conversion to FB2 markdown file.</p>
+<p>Let's make this annotation more <emphasis>fancy</emphasis> by adding <code>markdown</code> to it.</p>
+</annotation>
+<date>2019</date>
+<coverpage><image xlink:href="#fictionup.png" /></coverpage>
+<lang>en</lang>
+<sequence name="All about FICTIONUP" number="1"/>
+</title-info><document-info>
+<author><first-name>Vadim</first-name><last-name>Druzhin</last-name></author>
+<program-used>fictionup 0.2</program-used>
+<date>2019</date>
+<id>fictionup-example-en-0002</id>
+<version>1.0</version>
+</document-info></description>
+<body><section><title><p>FICTIONUP MARKDOWN EXAMPLE</p></title>
+<empty-line/>
+</section>
+<section><title><p>Chapter 1. Text formatting</p></title>
+<p>Here goes regular text. <emphasis>This text will be emphasised (italic).</emphasis> <strong>And this text will be more emphasised (bold).</strong> <strong><emphasis>And this will be even more emphasised (bold italic).</emphasis></strong> <strikethrough>This text will be struck through</strikethrough> (if your FB2 viewer supports this feature).</p>
+<p>This text will be accompanied by<sup>superscript (upper index)</sup>. <code>And this will be *inline* code span.</code> Followed by another regular text.</p>
+<empty-line/>
+</section>
+<section><title><p>Chapter 2. Special paragraph types</p></title>
+<section><title><p>2.1. Unordered list</p></title>
+<p>Unordered list may look like this:</p>
+<p>   • First item </p>
+<p>   • Second item </p>
+<p>   • Third item </p>
+<p>Or like this:</p>
+<p>   • First item </p>
+<p>   • Second item </p>
+<p>   • Third item </p>
+<empty-line/>
+</section>
+<section><title><p>2.2. Ordered list</p></title>
+<p>Ordered list will be like that:</p>
+<p>   1. First item </p>
+<p>   2. Second item </p>
+<p>   3. Third item </p>
+<p>In fact, item numbers does not matter:</p>
+<p>   1. <emphasis>First</emphasis> item </p>
+<p>   2. <strong>Second</strong> item </p>
+<p>   3. <strong><emphasis>Third</emphasis></strong> item </p>
+<empty-line/>
+</section>
+<section><title><p>2.3. Citation</p></title>
+<p>Citation may be extended across several paragraphs:</p>
+<cite><p>Some very important things that was said. By some very important person.</p>
+<p>And this <emphasis>things</emphasis> also <strong>may have</strong> different formatting.</p>
+</cite>
+<empty-line/>
+</section>
+<section><title><p>2.4. Preforamted code</p></title>
+<p>Code block will look like this:</p>
+<p><code>#include &lt;stdio.h&gt;
+
+int main()
+    {
+    printf("*Hello* **world!**\n");
+    }
+</code></p>
+<empty-line/>
+</section>
+<section><title><p>2.5. Tables</p></title>
+<p>Not all FB2 viewers support tables, so this text may look as a nice table or not.</p>
+<table><tr><th>First column (left aligned)</th><th align="center">Second column (centered)</th><th align="right">Third column (right aligned)</th></tr>
+<tr><td>Some</td><td align="center">rows</td><td align="right">of text</td></tr>
+<tr><td>And</td><td align="center">some</td><td align="right">more</td></tr>
+</table>
+<empty-line/>
+</section>
+</section>
+<section><title><p>Chapter 3. Delimiters</p></title>
+<p>Paragraphs in document may be delimited by some sort of horizontal ruler. Like this:</p>
+<subtitle>* * *</subtitle>
+<p>Or this:</p>
+<subtitle>* * *</subtitle>
+<p>Or this:</p>
+<subtitle>* * *</subtitle>
+<p>Also paragraph containing just one '\' symbol will produce empty line.</p>
+<empty-line/>
+<p>Like above this one.</p>
+<empty-line/>
+</section>
+<section><title><p>Chapter 4. Links and images</p></title>
+<p>Document may contain hyperlinks: <a xlink:href="http://cdslow.org.ru/">cdslow.org.ru</a>.</p>
+<p>And images: <image xlink:href="#fictionup.png" />.</p>
+<p>Some text may be followed by in depth explanation<a xlink:href="#note_1" type="note">1</a>.</p>
+<subtitle>* * *</subtitle>
+<p><strong>The End</strong></p>
+<empty-line/>
+</section>
+</body>
+<body name="notes"><section id="note_1"><title><p>1</p></title>
+<p>In form of footnotes.</p>
+</section>
+</body>
+<binary id="fictionup.png" content-type="image/png">
+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
+</binary>
+</FictionBook>

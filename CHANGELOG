@@ -1,0 +1,10 @@
+* Wed Sep 11 2019 Vadim Druzhin <cdslow@mail.ru> - 0.2.1
+- Add workaround for Gentoo patched zlib.
+
+* Sun May  5 2019 Vadim Druzhin <cdslow@mail.ru> - 0.2
+- Add 'Series:' meta-information tag;
+- Support markdown formatting in the annotation;
+- Add ZIP output.
+
+* Thu Dec 14 2017 Vadim Druzhin <cdslow@mail.ru> - 0.1
+- First release.
